@@ -13,3 +13,11 @@ class BaseDatabase:
 
     def lookup_strings_by_feature_set_size_and_feature(self, size, feature):
         raise NotImplementedError
+
+    def __getstate__(self):
+        """To pickle the object"""
+        return self.__dict__
+
+    def __setstate__(self, d):
+        """To unpickle the object"""
+        self.__dict__ = d

@@ -56,13 +56,6 @@ class DictDatabase(BaseDatabase):
     def max_feature_size(self) -> int:
         return self._max_feature_size
 
-    # def __getstate__(self):
-    #     """To pickle the object"""
-    #     return self.__dict__
-
-    # def __setstate__(self, d):
-    #     """To unpickle the object"""
-    #     self.__dict__ = d
 
     def to_pickle(self, f: BufferedWriter) -> None:
         """Hack to get object savable with mypyc

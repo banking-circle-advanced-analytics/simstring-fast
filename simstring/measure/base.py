@@ -10,3 +10,11 @@ class BaseMeasure:
 
     def similarity(self, X, Y) -> float:
         raise NotImplementedError
+
+    def __getstate__(self):
+        """To pickle the object"""
+        return self.__dict__
+
+    def __setstate__(self, d):
+        """To unpickle the object"""
+        self.__dict__ = d

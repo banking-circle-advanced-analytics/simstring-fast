@@ -42,3 +42,11 @@ class BaseFeatureExtractor:
     def __define__(self) -> str:
         "Custom representation string"
         raise NotImplementedError()
+
+    def __getstate__(self):
+        """To pickle the object"""
+        return self.__dict__
+
+    def __setstate__(self, d):
+        """To unpickle the object"""
+        self.__dict__ = d
