@@ -78,6 +78,9 @@ class DictDatabase(BaseDatabase):
         }
         pickle.dump(data, f)
 
+   
+
+
     @staticmethod
     def from_dict(data: dict) -> "DictDatabase":
         """Hack to get object loadable with mypyc
@@ -108,50 +111,12 @@ class DictDatabase(BaseDatabase):
         obj._max_feature_size = data["_max_feature_size"]
         return obj
 
-    def save(self, filename: str):
-        """Save the database to a file as defined by filename.
-
-        Args:
-            filename: Filename to save the db at. Should include file extension.
-
-        Returns:
-            None
-        """
-        with open(filename, "wb") as f:
-            pickle.dump(self, f)
-
-    @staticmethod
-    def load(filename: str) -> "DictDatabase":
-        """Load db from a file
-
-        Args:
-            filename (str): Name of the file to load
-
-        Returns:
-            DictDatabase: the db
-        """
+    @classmethod
+    def from_file(cls, filename: str) -> "DictDatabase":
         with open(filename, "rb") as f:
-            db = pickle.load(f)
-        return db
+            data = pickle.load(f)
+        return cls.from_dict(data)  
 
-    def dumps(self) -> bytes:
-        """Generate pickle byte stream
-
-        Returns:
-            _type_: _description_
-        """
-        return pickle.dumps(self)
-
-    @staticmethod
-    def loads(binary_data: bytes) -> "DictDatabase":
-        """Load a binary string representing a database
-
-        Initially only unpickles the data
-
-        Args:
-            binary_data (str): String of data to unpickle
-
-        Returns:
-            Model object
-        """
-        return pickle.loads(binary_data)
+    def to_file(self, filename: str) -> None:
+        with open(filename, "wb") as f:
+            self.to_pickle(f)

@@ -13,3 +13,7 @@ dev/geo_matching.py
 *.so
 .coverage
 simstring/site/
+.mypy_cache/
+.pytest_cache/
+
+test.pkl
