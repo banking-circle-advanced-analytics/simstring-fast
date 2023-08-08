@@ -6,17 +6,18 @@ import numpy as np
 
 from simstring.feature_extractor.character_ngram import CharacterNgramFeatureExtractor
 from simstring.measure.cosine import (
-    CosineMeasure,
-)  # , OverlapMeasure, LeftOverlapMeasure
+    CosineMeasure
+)
+from simstring.measure.left_cosine import (
+    LeftCosineMeasure as CosineMeasure
+) 
 
-# from simstring.database.mongo import MongoDatabase
 from simstring.database.dict import DictDatabase
 from simstring.searcher import Searcher
 
 from pyinstrument import Profiler
 
 profiler = Profiler()
-
 
 def output_similar_strings_of_each_line(path, measure):
     strings = []
@@ -48,9 +49,3 @@ def output_similar_strings_of_each_line(path, measure):
 
 measure = CosineMeasure()
 output_similar_strings_of_each_line("dev/data/company_names.txt", measure)
-
-# measure = OverlapMeasure()
-# output_similar_strings_of_each_line("dev/data/company_names.txt", measure)
-
-# measure = LeftOverlapMeasure()
-# output_similar_strings_of_each_line("./data/company_names.txt", measure)

@@ -4,6 +4,7 @@ from unittest import TestCase
 from simstring.searcher import Searcher
 from simstring.database.dict import DictDatabase
 from simstring.measure.cosine import CosineMeasure
+from simstring.measure.left_cosine import LeftCosineMeasure
 from simstring.measure.jaccard import JaccardMeasure
 from simstring.feature_extractor.character_ngram import CharacterNgramFeatureExtractor
 
@@ -80,6 +81,28 @@ class TestRankedSearchCosine(TestCase):
         goal = OrderedDict({"foo": 0.8660254037844387, "fooo": 0.7745966692414834})
         self.assertEqual(results, goal)
 
+
+class TestSearchLeftCosine(TestCase):
+    def setUp(self) -> None:
+        db = DictDatabase(CharacterNgramFeatureExtractor(2))
+        db.add("vladimir putin")
+        db.add("isis")
+        db.add("kim jong un")
+        db.add("isabel jose dos santos")
+        self.searcher = Searcher(db, LeftCosineMeasure())
+
+    def test_search(self) -> None:
+        self.assertEqual(self.searcher.search("vlad putin", 0.7), ["vladimir putin"])
+        self.assertEqual(self.searcher.search("donation for the benefit of make great again vlad putin", 0.7), ["vladimir putin"])
+        breakpoint()
+        self.assertEqual(self.searcher.search("isis medical center", 0.7), ["isis"])
+
+        self.assertEqual(self.searcher.search("donation for the benefit of make great again isis", 0.5), ["vladimir putin"])
+
+
+        self.assertEqual(self.searcher.search("isabel santos", 0.7), ["isabel jose dos santos"])
+        self.assertEqual(self.searcher.search("donation for the benefit of make great again vlad putin", 0.5), ["vladimir putin"])
+    
 
 class TestRankedSearchCosineLong(TestCase):
     def setUp(self) -> None:
