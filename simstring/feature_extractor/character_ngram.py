@@ -3,6 +3,7 @@ from typing import List
 
 
 class CharacterNgramFeatureExtractor(BaseFeatureExtractor):
+    __slots__ = "n"
     def __init__(self, n: int = 2):
         self.n = n
 

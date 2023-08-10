@@ -19,14 +19,23 @@ class Searcher:
         self.lookup_strings_result: dict = defaultdict(dict)
 
     def search(self, query_string: str, alpha: float) -> List[str]:
+        """Find matches for sting returning multiple ranked matches.
+
+        Args:
+            query_string (str): string to find a match in
+            alpha (float): minimum similarity
+
+        Returns:
+            list[str]: list of matched strings
+        """
         features = self.feature_extractor.features(query_string)
-        lf = len(features)
-        min_feature_size = self.measure.min_feature_size(lf, alpha)
-        max_feature_size = self.measure.max_feature_size(lf, alpha)
+        query_size = len(features)
+        min_feature_size = self.measure.min_feature_size(query_size, alpha)
+        max_feature_size = self.measure.max_feature_size(query_size, alpha)
         results = []
 
         for candidate_feature_size in range(min_feature_size, max_feature_size + 1):
-            tau = self.__min_overlap(lf, candidate_feature_size, alpha)
+            tau = self.__min_overlap(query_size, candidate_feature_size, alpha)
             results.extend(self.__overlap_join(features, tau, candidate_feature_size))
         return results
 
@@ -36,8 +45,8 @@ class Searcher:
         """Find matches for sting returning multiple ranked matches.
 
         Args:
-            query_string (str): string to match
-            alpha (float): min similarity
+            query_string (str): string to find a match in
+            alpha (float): minimum similarity
 
         Returns:
             OrderedDict[str, float]: Matched string with similarity
@@ -77,16 +86,16 @@ class Searcher:
         query_feature_size = len(features)
 
         features_mapped_to_lookup_strings_sets = {
-            x: self.__lookup_strings_by_feature_set_size_and_feature(
-                candidate_feature_size, x
+            feature: self.__lookup_strings_by_feature_set_size_and_feature(
+                candidate_feature_size, feature
             )
-            for x in features
+            for feature in features
         }
 
         features.sort(key=lambda x: len(features_mapped_to_lookup_strings_sets[x]))
 
-        # candidate_string_to_matched_count : Dict[str,int] = defaultdict(int) # Only in 3.10 and later
-        candidate_string_to_matched_count: Dict[str, int] = dict()
+        candidate_string_to_matched_count : Dict[str,int] = defaultdict(int) # Only in 3.10 and later
+        # candidate_string_to_matched_count: Dict[str, int] = dict()
         results = []
         for feature in features[0 : query_feature_size - tau + 1]:
             for s in features_mapped_to_lookup_strings_sets[feature]:

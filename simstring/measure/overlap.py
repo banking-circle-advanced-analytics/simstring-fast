@@ -3,6 +3,7 @@ from typing import Iterable
 
 
 class OverlapMeasure:
+    __slots__ = "maxsize"
     def __init__(self, db=None, maxsize: int = 100) -> None:
         super().__init__()
         if db:
@@ -27,6 +28,8 @@ class OverlapMeasure:
 
 
 class LeftOverlapMeasure:
+    __slots__ = "maxsize"
+
     def __init__(self, db=None, maxsize: int = 100) -> None:
         super().__init__()
         if db:

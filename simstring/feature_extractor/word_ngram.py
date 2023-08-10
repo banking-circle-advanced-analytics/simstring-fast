@@ -3,6 +3,7 @@ from typing import List
 
 
 class WordNgramFeatureExtractor(BaseFeatureExtractor):
+    __slots__ = "n", "splitter"
     def __init__(self, n=2, splitter=" "):
         self.n = n
         self.splitter = splitter

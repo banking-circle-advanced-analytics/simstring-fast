@@ -13,6 +13,8 @@ def defaultdict_set():
 
 
 class DictDatabase(BaseDatabase):
+    __slots__ = "feature_extractor", "strings", "feature_set_size_to_string_map", "feature_set_size_and_feature_to_string_map", "_min_feature_size", "_max_feature_size"
+
     def __init__(
         self,
         feature_extractor: Union[
