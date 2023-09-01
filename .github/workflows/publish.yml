@@ -3,6 +3,9 @@ name: Upload to PyPi
 on:
   release:
     types: [created]
+  push:
+    branches: 
+      - '*'
 
 jobs:
   build:
@@ -28,11 +31,43 @@ jobs:
           pip install build
       - name: Build package
         run: python -m build
-    
-      - name: Publish package
-        uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+
+      - name: Archive wheel artifacts
+        uses: actions/upload-artifact@v3
         with:
-          user: __token__
-          password: ${{ secrets.PYPI_SIMSTRING_UPLOAD_TOKEN }}
-          skip_existing: true
+          name: dist-without-markdown
+          path: |
+            dist/*.whl
+
+      - name: Archive tar.gz artifacts
+        uses: actions/upload-artifact@v3
+
+        if: ${{ matrix.python-version == '3.11' }} 
+        with:
+          name: dist-without-markdown
+          path: |
+            dist/*.tar.gz
+
+  publish:
+    name: Publish to Pypi
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+
+    - uses: actions/download-artifact@v3
+      with:
+        name: dist
+        path: dist
+        
+    - name: Display structure of downloaded files
+      run: ls -R
+      working-directory: dist
+
+      # - name: Publish package
+      #   uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+      #   with:
+      #     user: __token__
+      #     password: ${{ secrets.PYPI_SIMSTRING_UPLOAD_TOKEN }}
+
 
