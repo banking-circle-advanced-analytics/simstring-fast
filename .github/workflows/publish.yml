@@ -35,7 +35,7 @@ jobs:
       - name: Archive wheel artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: dist-without-markdown
+          name: dist
           path: |
             dist/*.whl
 
@@ -44,7 +44,7 @@ jobs:
 
         if: ${{ matrix.python-version == '3.11' }} 
         with:
-          name: dist-without-markdown
+          name: dist
           path: |
             dist/*.tar.gz
 
