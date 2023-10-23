@@ -4,6 +4,7 @@ from simstring.measure.cosine import CosineMeasure
 from simstring.measure.overlap import OverlapMeasure, LeftOverlapMeasure
 
 from simstring.database.dict import DictDatabase
+from simstring.database.graph import GDatabase
 from simstring.database.disk import DiskDatabase
 from simstring.searcher import Searcher
 from tqdm import tqdm
@@ -47,7 +48,7 @@ if __name__ =="__main__":
     # file = "dev/data/addresses.csv"
     # measures =  [CosineMeasure(), OverlapMeasure(), LeftOverlapMeasure()]
     measures =  [CosineMeasure()]
-    for db_cls in [DictDatabase, DiskDatabase]:
+    for db_cls in [DictDatabase, DiskDatabase, GDatabase]:
         profiler = output_similar_strings_of_each_line(file, measures, db_cls)
 
     # for db_cls in [DictDatabase,DiskDatabase]:
