@@ -5,6 +5,7 @@ from simstring.searcher import Searcher
 from simstring.database.dict import DictDatabase
 from simstring.measure.cosine import CosineMeasure
 from simstring.measure.jaccard import JaccardMeasure
+from simstring.measure.dot import DotMeasure
 from simstring.feature_extractor.character_ngram import CharacterNgramFeatureExtractor
 
 from collections import OrderedDict
@@ -125,4 +126,25 @@ class TestRankedSearchJaccard(TestCase):
                 "fool": 0.3333333333333333,
             }
         )
+        self.assertEqual(results, goal)
+
+
+
+
+class TestRankedSearchDot(TestCase):
+    def setUp(self) -> None:
+        db = DictDatabase(CharacterNgramFeatureExtractor(2))
+        db.add("volodomir selenski")
+        db.add("vladimir putin")
+        db.add("muammar gaddafi")
+        self.searcher = Searcher(db, DotMeasure(db))
+
+    def test_ranked_search_example1(self):
+        results = self.searcher.ranked_search("vladimir putin is my favorite president of russia", 0.5)
+        goal = OrderedDict([('vladimir putin', 0.9333333333333333)])
+        self.assertEqual(results, goal)
+
+    def test_ranked_search_example2(self):
+        results = self.searcher.ranked_search("vladimir putin is my favorite president of russia and donald trump is his biggest fan.", 0.6)
+        goal = OrderedDict({"foo": 0.8660254037844387, "fooo": 0.7745966692414834})
         self.assertEqual(results, goal)

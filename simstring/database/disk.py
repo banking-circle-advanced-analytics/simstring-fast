@@ -29,6 +29,9 @@ class DiskDatabase(BaseDatabase):
         self.feature_set_size_and_feature_to_string_map: dc.Cache = dc.Cache(os.path.join(path,'feature_set_size_and_feature_to_string_map'))
         self.path = path
 
+        self._min_feature_size : int = 9999999
+        self._max_feature_size :int  = 0
+
     @staticmethod
     def _make_key(size: int, feature: str) -> str:
         return f"{size}-{feature}"
@@ -55,8 +58,13 @@ class DiskDatabase(BaseDatabase):
 
     def add(self, string: str) -> None:
         features = self.feature_extractor.features(string)
-
         size = len(features)
+
+        if size > self._max_feature_size:
+            self._max_feature_size = size
+        if size < self._min_feature_size:
+            self._min_feature_size = size
+
         with self.feature_set_size_to_string_map.transact():  
             if size not in self.feature_set_size_to_string_map:
                 size_to_string_map = set()

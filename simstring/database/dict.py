@@ -25,13 +25,18 @@ class DictDatabase(BaseDatabase):
         self.feature_set_size_and_feature_to_string_map: dict = defaultdict(
             defaultdict_set
         )
-        self._min_feature_size = 9999999
-        self._max_feature_size = 0
+        self._min_feature_size : int= 9999999
+        self._max_feature_size :int = 0
 
     def add(self, string: str) -> None:
         features = self.feature_extractor.features(string)
         size = len(features)
 
+        if size > self._max_feature_size:
+            self._max_feature_size = size
+        if size < self._min_feature_size:
+            self._min_feature_size = size
+            
         self.strings.append(string)
 
         if size not in self.feature_set_size_to_string_map:

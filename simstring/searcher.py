@@ -1,10 +1,16 @@
 # -*- coding:utf-8 -*-
 from collections import defaultdict, OrderedDict
 from typing import OrderedDict as OrderedDictType
+from simstring.database.dict import DictDatabase
+from simstring.database.disk import DiskDatabase
+from simstring.measure.cosine import CosineMeasure
+from simstring.measure.dice import DiceMeasure
+from simstring.measure.dot import DotMeasure
+from simstring.measure.jaccard import JaccardMeasure
 
 
 class Searcher:
-    def __init__(self, db, measure) -> None:
+    def __init__(self, db: DictDatabase | DiskDatabase, measure: CosineMeasure | DiceMeasure | DotMeasure | JaccardMeasure) -> None:
         """Searcher class
 
         This is the main way of interacting with the simsting search.
@@ -24,7 +30,7 @@ class Searcher:
         min_feature_size = self.measure.min_feature_size(lf, alpha)
         max_feature_size = self.measure.max_feature_size(lf, alpha)
         results = []
-
+        breakpoint()
         for candidate_feature_size in range(min_feature_size, max_feature_size + 1):
             tau = self.__min_overlap(lf, candidate_feature_size, alpha)
             results.extend(self.__overlap_join(features, tau, candidate_feature_size))

@@ -17,9 +17,10 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: CPython",
 ]
-dependencies = ["diskcache==5.6.3"]
+dependencies = ["diskcache==5.6.3", "setuptools>=70.0.0"]
 dynamic = ["version"]
 
 [project.urls]
@@ -48,6 +49,17 @@ exclude = [
   "simstring/database/base.py",
 ]
 
+
+[tool.hatch.envs.default.scripts]
+pre-install-commands = [
+  "python -m ensurepip --upgrade",
+  "python -m pip install --upgrade setuptools",
+]
+version = "python --version"
+cov = "pytest --cov-report=term --cov-config=pyproject.toml {args}"
+no-cov = "cov --no-cov {args}"
+build = "python -m build"
+
 [tool.hatch.envs.test]
 dependencies = [
   "pytest==7.4.2",
@@ -56,18 +68,15 @@ dependencies = [
   "cython==3.0.0",
   "faker",
   "tqdm",
-  "pdbpp"
+  "pdbpp",
+  "setuptools"
 ]
 
-[tool.hatch.envs.default.scripts]
-version = "python --version"
-cov = "pytest --cov-report=term --cov-config=pyproject.toml {args}"
-no-cov = "cov --no-cov {args}"
-build = "python -m build"
+
 
 [[tool.hatch.envs.test.matrix]]
 # python = ["38","39", "310", "311"]
-python = ["310", "311"]
+python = ["310", "311", "312"]
 
 [tool.coverage.run]
 branch = true
@@ -99,13 +108,18 @@ serve = "cd simstring && mkdocs serve --dev-addr localhost:8000"
 
 
 [tool.hatch.envs.benchmark]
+pre-install-commands = [
+  "python -m ensurepip --upgrade",
+  "python -m pip install --upgrade setuptools",
+]
 dependencies = [
    "pyinstrument", "benchmarker" , "numpy", "tqdm"
 ]
 [[tool.hatch.envs.benchmark.matrix]]
-python = [ "310", "311"]
+python = [ "310", "311", "312"]
 
 [tool.hatch.envs.benchmark.scripts]
+
 run = "python dev/benchmark.py"
 instrument = "pip install . && python dev/company_names.py"
 adds = "pip install . && python dev/benchmarking_adds.py"
