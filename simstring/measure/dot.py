@@ -9,12 +9,12 @@ class DotMeasure:
     def __init__(self, db: None| DictDatabase | DiskDatabase =None, minsize: int = 1) -> None:
     
         if db:
-            self.maxsize = db._min_feature_size
+            self.minsize = db._min_feature_size
         else:
-            self.maxsize = minsize
+            self.minsize = minsize
 
     def min_feature_size(self, query_size: int, alpha: float) -> int:
-        return 1
+        return self.minsize
 
     def max_feature_size(self, query_size: int, alpha: float) -> int:
         return query_size
