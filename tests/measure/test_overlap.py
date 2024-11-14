@@ -1,66 +1,76 @@
 # -*- coding:utf-8 -*-
 
-from unittest import TestCase
+import pytest
 from simstring.measure.overlap import OverlapMeasure, LeftOverlapMeasure
 
-
 maxsize = 5
 
+# Initialize measure instances for both overlap types
+overlap_measure = OverlapMeasure(maxsize=maxsize)
+left_overlap_measure = LeftOverlapMeasure(maxsize=maxsize)
 
-class TestOverlap(TestCase):
-    measure = OverlapMeasure(maxsize=maxsize)
+# Test cases for OverlapMeasure
+@pytest.mark.parametrize("feature_count, similarity, expected_min_size", [
+    (5, 1.0, 5),
+    (5, 0.5, 2)
+])
+def test_overlap_min_feature_size(feature_count, similarity, expected_min_size):
+    assert overlap_measure.min_feature_size(feature_count, similarity) == expected_min_size
 
-    def test_min_feature_size(self):
-        self.assertEqual(self.measure.min_feature_size(5, 1.0), 5)
-        self.assertEqual(self.measure.min_feature_size(5, 0.5), 2)
+@pytest.mark.parametrize("feature_count, similarity, expected_max_size", [
+    (5, 1.0, maxsize),
+    (5, 0.5, maxsize)
+])
+def test_overlap_max_feature_size(feature_count, similarity, expected_max_size):
+    assert overlap_measure.max_feature_size(feature_count, similarity) == expected_max_size
 
-    def test_max_feature_size(self):
-        self.assertEqual(self.measure.max_feature_size(5, 1.0), maxsize)
-        self.assertEqual(self.measure.max_feature_size(5, 0.5), maxsize)
+@pytest.mark.parametrize("x_size, y_size, similarity, expected_count", [
+    (5, 5, 1.0, 5),
+    (5, 20, 1.0, 5),
+    (5, 5, 0.5, 3)
+])
+def test_overlap_minimum_common_feature_count(x_size, y_size, similarity, expected_count):
+    assert overlap_measure.minimum_common_feature_count(x_size, y_size, similarity) == expected_count
 
-    def test_minimum_common_feature_count(self):
-        self.assertEqual(self.measure.minimum_common_feature_count(5, 5, 1.0), 5)
-        self.assertEqual(self.measure.minimum_common_feature_count(5, 20, 1.0), 5)
-        self.assertEqual(self.measure.minimum_common_feature_count(5, 5, 0.5), 3)
+@pytest.mark.parametrize("x, y, expected_similarity", [
+    ([1, 2, 3], [1, 2, 3], 3),
+    ([1, 2, 3], [1, 2, 3, 4], 3),
+    ([1, 2, 3], [1, 1, 2, 3], 3),
+    ([1, 2, 3, 4], [1, 1, 2, 3], 3),
+    ([1, 1, 2, 3], [1, 1, 2, 3], 3)
+])
+def test_overlap_similarity(x, y, expected_similarity):
+    assert round(overlap_measure.similarity(x, y), 2) == expected_similarity
 
-    def test_similarity(self):
-        x = [1, 2, 3]
-        y = [1, 2, 3, 4]
-        self.assertEqual(round(self.measure.similarity(x, x), 2), 3)
-        self.assertEqual(round(self.measure.similarity(x, y), 2), 3)
+# Test cases for LeftOverlapMeasure
+@pytest.mark.parametrize("feature_count, similarity, expected_min_size", [
+    (5, 1.0, 5),
+    (5, 0.5, 2)
+])
+def test_left_overlap_min_feature_size(feature_count, similarity, expected_min_size):
+    assert left_overlap_measure.min_feature_size(feature_count, similarity) == expected_min_size
 
-        z = [1, 1, 2, 3]
-        self.assertEqual(round(self.measure.similarity(x, z), 2), 3)
-        self.assertEqual(round(self.measure.similarity(y, z), 2), 3)
-        self.assertEqual(round(self.measure.similarity(z, z), 2), 3)
+@pytest.mark.parametrize("feature_count, similarity, expected_max_size", [
+    (5, 1.0, maxsize),
+    (5, 0.5, maxsize)
+])
+def test_left_overlap_max_feature_size(feature_count, similarity, expected_max_size):
+    assert left_overlap_measure.max_feature_size(feature_count, similarity) == expected_max_size
 
+@pytest.mark.parametrize("x_size, y_size, similarity, expected_count", [
+    (5, 5, 1.0, 5),
+    (5, 20, 1.0, 5),
+    (5, 5, 0.5, 2)
+])
+def test_left_overlap_minimum_common_feature_count(x_size, y_size, similarity, expected_count):
+    assert left_overlap_measure.minimum_common_feature_count(x_size, y_size, similarity) == expected_count
 
-maxsize = 5
-
-
-class TestLeftOverlap(TestCase):
-    measure = LeftOverlapMeasure(maxsize=maxsize)
-
-    def test_min_feature_size(self):
-        self.assertEqual(self.measure.min_feature_size(5, 1.0), 5)
-        self.assertEqual(self.measure.min_feature_size(5, 0.5), 2)
-
-    def test_max_feature_size(self):
-        self.assertEqual(self.measure.max_feature_size(5, 1.0), maxsize)
-        self.assertEqual(self.measure.max_feature_size(5, 0.5), maxsize)
-
-    def test_minimum_common_feature_count(self):
-        self.assertEqual(self.measure.minimum_common_feature_count(5, 5, 1.0), 5)
-        self.assertEqual(self.measure.minimum_common_feature_count(5, 20, 1.0), 5)
-        self.assertEqual(self.measure.minimum_common_feature_count(5, 5, 0.5), 2)
-
-    def test_similarity(self):
-        x = [1, 2, 3]
-        y = [1, 2, 3, 4]
-        self.assertEqual(round(self.measure.similarity(x, x), 2), 1.0)
-        self.assertEqual(round(self.measure.similarity(x, y), 2), 1.0)
-
-        z = [1, 1, 2, 3]
-        self.assertEqual(round(self.measure.similarity(x, z), 2), 1.0)
-        self.assertEqual(round(self.measure.similarity(y, z), 2), 0.75)
-        self.assertEqual(round(self.measure.similarity(z, z), 2), 1.0)
+@pytest.mark.parametrize("x, y, expected_similarity", [
+    ([1, 2, 3], [1, 2, 3], 1.0),
+    ([1, 2, 3], [1, 2, 3, 4], 1.0),
+    ([1, 2, 3], [1, 1, 2, 3], 1.0),
+    ([1, 2, 3, 4], [1, 1, 2, 3], 0.75),
+    ([1, 1, 2, 3], [1, 1, 2, 3], 1.0)
+])
+def test_left_overlap_similarity(x, y, expected_similarity):
+    assert round(left_overlap_measure.similarity(x, y), 2) == expected_similarity

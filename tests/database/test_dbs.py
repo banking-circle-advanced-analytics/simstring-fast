@@ -1,61 +1,65 @@
-# -*- coding:utf-8 -*-
+## -*- coding:utf-8 -*-
 
-from unittest import TestCase
+import pytest
 from simstring.database.dict import DictDatabase
 from simstring.database.disk import DiskDatabase
 from simstring.feature_extractor.character_ngram import CharacterNgramFeatureExtractor
 import os
 import shutil
-from multiprocessing import Pool, cpu_count
-
-
+from multiprocessing import Pool
 from faker import Faker
 import random
 
-class TestComparability(TestCase):
-    f = Faker()
-    Faker.seed(0)
+# Set up Faker
+f = Faker()
+Faker.seed(0)
 
-    def setUp(self):
-        self.strings = [self.f.name().replace('-',' ') for _ in range(100)]
+# Fixture to create random strings
+@pytest.fixture
+def strings():
+    return [f.name().replace('-', ' ') for _ in range(100)]
 
-        self.dict_db = DictDatabase(CharacterNgramFeatureExtractor(2))
-        for string in self.strings:
-            self.dict_db.add(string)
+# Fixture for DictDatabase
+@pytest.fixture
+def dict_db(strings):
+    db = DictDatabase(CharacterNgramFeatureExtractor(2))
+    for string in strings:
+        db.add(string)
+    return db
 
-        self.disk_db =  DiskDatabase(CharacterNgramFeatureExtractor(2), path=f"tmp_db_for_tests-{random.randint(1000,10000)}")
-
-        with  Pool(processes=8) as pool:
-            for _ in pool.imap_unordered(self.disk_db.add, self.strings):
-                pass
-
-    def tearDown(self) -> None:
-        try:
-            shutil.rmtree(self.disk_db.path)
-        except:
+# Fixture for DiskDatabase with setup and teardown
+@pytest.fixture
+def disk_db(strings):
+    path = f"tmp_db_for_tests-{random.randint(1000,10000)}"
+    db = DiskDatabase(CharacterNgramFeatureExtractor(2), path=path)
+    with Pool(processes=8) as pool:
+        for _ in pool.imap_unordered(db.add, strings):
             pass
-        return super().tearDown()
-    
-    def test_strings(self):
-        self.assertEqual(set(self.dict_db.all()), set(self.disk_db.all()))
+    yield db
+    shutil.rmtree(path, ignore_errors=True)
 
+# Test to compare the contents of dict_db and disk_db
+def test_strings(dict_db, disk_db):
+    assert set(dict_db.all()) == set(disk_db.all())
 
-    def test_equivalence_disk_to_dict(self):
-        for key in self.disk_db.feature_set_size_to_string_map.iterkeys():
-            self.assertEqual(self.dict_db.feature_set_size_to_string_map[key], self.disk_db.feature_set_size_to_string_map[key])
+# Test for equivalence from disk_db to dict_db
+def test_equivalence_disk_to_dict(dict_db, disk_db):
 
-        for key in self.disk_db.feature_set_size_and_feature_to_string_map.iterkeys():
-            disk_val = self.disk_db.feature_set_size_and_feature_to_string_map[key]
-            k1, k2 = key.split('-')
-            dict_val = self.dict_db.feature_set_size_and_feature_to_string_map[int(k1)][k2]
-            self.assertEqual(disk_val, dict_val)
+    for key in disk_db.feature_set_size_to_string_map.iterkeys():
+        assert dict_db.feature_set_size_to_string_map[key] == disk_db.feature_set_size_to_string_map[key]
 
+    for key in disk_db.feature_set_size_and_feature_to_string_map.iterkeys():
+        disk_val = disk_db.feature_set_size_and_feature_to_string_map[key]
+        k1, k2 = key.split('-')
+        dict_val = dict_db.feature_set_size_and_feature_to_string_map[int(k1)][k2]
+        assert disk_val == dict_val
 
-    def test_equivalence_dict_to_disk(self):
-        for size, value in self.dict_db.feature_set_size_and_feature_to_string_map.items():
-            for feature, dict_value in value.items():
-                disk_value = self.disk_db.get_feature_set_size_and_feature_to_string_map(size, feature)
-                self.assertEqual(dict_value, disk_value)
+# Test for equivalence from dict_db to disk_db
+def test_equivalence_dict_to_disk(dict_db, disk_db):
+    for size, value in dict_db.feature_set_size_and_feature_to_string_map.items():
+        for feature, dict_value in value.items():
+            disk_value = disk_db.get_feature_set_size_and_feature_to_string_map(size, feature)
+            assert dict_value == disk_value
 
-        for size, string_set in self.dict_db.feature_set_size_to_string_map.items():
-            self.assertEqual(string_set, self.disk_db.feature_set_size_to_string_map[size])
+    for size, string_set in dict_db.feature_set_size_to_string_map.items():
+        assert string_set == disk_db.feature_set_size_to_string_map[size]

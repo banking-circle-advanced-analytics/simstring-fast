@@ -1,23 +1,13 @@
 # -*- coding:utf-8 -*-
 
-from unittest import TestCase
+import pytest
 from simstring.feature_extractor.word_ngram import WordNgramFeatureExtractor
 
-
-
-class TestNgram(TestCase):
-    def test_features(self):
-        
-        self.assertEqual(
-            WordNgramFeatureExtractor().features("abcd"),
-            [(" ", "abcd"), ("abcd", " ")],
-        )
-        self.assertEqual(
-            WordNgramFeatureExtractor(2).features("hello world"),
-            [(" ", "hello"), ("hello", "world"), ("world", " ")],
-        )
-        self.assertEqual(
-            WordNgramFeatureExtractor(3).features("hello world"),
-            [(" ", "hello", "world"), ("hello", "world", " ")],
-        )
-      
+@pytest.mark.parametrize("n, input_text, expected_features", [
+    (2, "abcd", [(" ", "abcd"), ("abcd", " ")]),
+    (2, "hello world", [(" ", "hello"), ("hello", "world"), ("world", " ")]),
+    (3, "hello world", [(" ", "hello", "world"), ("hello", "world", " ")])
+])
+def test_features(n, input_text, expected_features):
+    extractor = WordNgramFeatureExtractor(n)
+    assert extractor.features(input_text) == expected_features
