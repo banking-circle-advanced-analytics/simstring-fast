@@ -1,65 +1,58 @@
 # -*- coding:utf-8 -*-
 
-from unittest import TestCase
-from simstring.database.disk import DiskDatabase
-from simstring.feature_extractor.character_ngram import CharacterNgramFeatureExtractor
+import pytest
 import random
 import pickle
 import os
 import shutil
+from simstring.database.disk import DiskDatabase
+from simstring.feature_extractor.character_ngram import CharacterNgramFeatureExtractor
 
-class TestDisk(TestCase):
+
+@pytest.fixture
+def disk_db():
+    # Setup the DiskDatabase with a random temporary path and add strings
+    db = DiskDatabase(CharacterNgramFeatureExtractor(2), path=f"tmp_db_for_tests-{random.randint(1000, 10000)}")
     strings = ["a", "ab", "abc", "abcd", "abcde"]
-
-    def setUp(self):
-        self.db = DiskDatabase(CharacterNgramFeatureExtractor(2), path=f"tmp_db_for_tests-{random.randint(1000,10000)}")
-        for string in self.strings:
-            self.db.add(string)
-
-    
-    def tearDown(self) -> None:
-        try:
-            shutil.rmtree(self.disk_db.path)
-        except:
-            pass
-        return super().tearDown()
-
-    def test_strings(self):
-        self.assertEqual(sorted(self.db.all()), sorted(self.strings))
+    for string in strings:
+        db.add(string)
+    yield db
+    # Teardown: Remove the database folder after test is completed
+    shutil.rmtree(db.path, ignore_errors=True)
 
 
-    def test_lookup_strings_by_feature_set_size_and_feature(self):
-        self.assertEqual(
-            self.db.lookup_strings_by_feature_set_size_and_feature(4, "ab_1"),
-            set(["abc"]),
-        )
-        self.assertEqual(
-            self.db.lookup_strings_by_feature_set_size_and_feature(3, "ab_1"),
-            set(["ab"]),
-        )
-        self.assertEqual(
-            self.db.lookup_strings_by_feature_set_size_and_feature(2, "ab_1"), set([])
-        )
+# Test case to check the strings stored in the database
+def test_strings(disk_db):
+    expected_strings = ["a", "ab", "abc", "abcd", "abcde"]
+    assert sorted(disk_db.all()) == sorted(expected_strings)
 
-    def test_load_from_folder(self):
 
-        with open("test.pkl", "wb") as f:
-            pickle.dump(self.db, f)
+# Test case for lookup functionality by feature set size and feature
+@pytest.mark.parametrize("feature_size, feature, expected_result", [
+    (4, "ab_1", {"abc"}),
+    (3, "ab_1", {"ab"}),
+    (2, "ab_1", set()),
+])
+def test_lookup_strings_by_feature_set_size_and_feature(disk_db, feature_size, feature, expected_result):
+    result = disk_db.lookup_strings_by_feature_set_size_and_feature(feature_size, feature)
+    assert result == expected_result
 
-        
-        with open("test.pkl", "rb") as f:
-            new =  pickle.load(f)
 
-        self.assertEqual(
-            self.db.feature_extractor.__class__, new.feature_extractor.__class__
-        )
-        self.assertEqual(self.db.feature_extractor.n, new.feature_extractor.n)
-        self.assertEqual(
-            set(self.db.feature_set_size_to_string_map.iterkeys()), set(new.feature_set_size_to_string_map.iterkeys())
-        )
-        self.assertEqual(
-            set(self.db.feature_set_size_and_feature_to_string_map.iterkeys()),
-            set(new.feature_set_size_and_feature_to_string_map.iterkeys()),
-        )
+# Test case to test saving and loading the database using pickle
+def test_load_from_folder(disk_db):
+    # Save the database to a pickle file
+    with open("test.pkl", "wb") as f:
+        pickle.dump(disk_db, f)
 
-        os.remove("test.pkl")
+    # Load the database from the pickle file
+    with open("test.pkl", "rb") as f:
+        loaded_db = pickle.load(f)
+
+    # Validate the features and mappings
+    assert disk_db.feature_extractor.__class__ == loaded_db.feature_extractor.__class__
+    assert disk_db.feature_extractor.n == loaded_db.feature_extractor.n
+    assert set(disk_db.feature_set_size_to_string_map.iterkeys()) == set(loaded_db.feature_set_size_to_string_map.iterkeys())
+    assert set(disk_db.feature_set_size_and_feature_to_string_map.iterkeys()) == set(loaded_db.feature_set_size_and_feature_to_string_map.iterkeys())
+
+    # Clean up the pickle file after test
+    os.remove("test.pkl")
