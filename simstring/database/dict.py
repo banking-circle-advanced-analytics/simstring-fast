@@ -105,13 +105,14 @@ class DictDatabase(BaseDatabase):
         """Save the database to a file as defined by filename.
 
         Args:
-            filename: Filename to save the db at. Should include file extension.
+            filename: Filename to save the db at. Should include file extension. Saves as pickled json
 
         Returns:
             None
         """
         with open(filename, "wb") as f:
-            pickle.dump(self, f)
+            self.to_pickle(f)
+
 
     @classmethod
     def load(cls, filename: str) -> "DictDatabase":
@@ -126,8 +127,9 @@ class DictDatabase(BaseDatabase):
             DictDatabase: the db
         """
         with open(filename, "rb") as f:
-            return pickle.load(f)
+            data =  pickle.load(f)
 
+        return cls.from_dict(data)
        
 
     def dumps(self) -> bytes:
