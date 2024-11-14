@@ -49,12 +49,12 @@ def setup_compact_save(db):
     yield "test2.pkl"
     os.remove("test2.pkl")
 
-# def test_compact_save(db, setup_compact_save):
-#     new = DictDatabase.load(setup_compact_save)
+def test_compact_save(db, setup_compact_save):
+    new = DictDatabase.load(setup_compact_save)
 
-#     assert db._min_feature_size == new._min_feature_size
-#     assert db._max_feature_size == new._max_feature_size
-#     assert db.feature_extractor.__class__ == new.feature_extractor.__class__
-#     assert db.feature_extractor.n == new.feature_extractor.n
-#     assert db.feature_set_size_to_string_map == new.feature_set_size_to_string_map
-#     assert db.feature_set_size_and_feature_to_string_map == new.feature_set_size_and_feature_to_string_map
+    assert db._min_feature_size == new._min_feature_size
+    assert db._max_feature_size == new._max_feature_size
+    assert db.feature_extractor.__class__ == new.feature_extractor.__class__
+    assert db.feature_extractor.n == new.feature_extractor.n
+    assert db.feature_set_size_to_string_map == new.feature_set_size_to_string_map
+    assert db.feature_set_size_and_feature_to_string_map == new.feature_set_size_and_feature_to_string_map
