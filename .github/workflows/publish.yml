@@ -1,9 +1,6 @@
 name: Upload to PyPi
 
 on:
-  push:
-    branches:
-      - '*'
   release:
     types: [created]
 
@@ -51,22 +48,22 @@ jobs:
           name: cibw-sdist
           path: dist/*.tar.gz
           
-  # upload_pypi:
-  #   needs: [build_wheels, build_sdist]
-  #   runs-on: ubuntu-latest
-  #   environment: pypi
-  #   steps:
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         # unpacks all CIBW artifacts into dist/
-  #         pattern: cibw-*
-  #         path: dist
-  #         merge-multiple: true
+  upload_pypi:
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          # unpacks all CIBW artifacts into dist/
+          pattern: cibw-*
+          path: dist
+          merge-multiple: true
 
-  #     - name: Publish package
-  #       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
-  #       with:
-  #         user: __token__
-  #         password: ${{ secrets.PYPI_SIMSTRING_UPLOAD_TOKEN }}
-  #         skip_existing: true
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_SIMSTRING_UPLOAD_TOKEN }}
+          skip_existing: true
 
