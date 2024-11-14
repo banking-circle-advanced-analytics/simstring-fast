@@ -59,9 +59,9 @@ class TestDict(TestCase):
 
 
     def test_compact_save(self):
-        self.db.save("test.pkl")
+        self.db.save("test2.pkl")
 
-        new = DictDatabase.load("test.pkl")
+        new = DictDatabase.load("test2.pkl")
         # self.assertEqual(self.db , new)
         self.assertEqual(self.db._min_feature_size, new._min_feature_size)
         self.assertEqual(self.db._max_feature_size, new._max_feature_size)
@@ -77,4 +77,4 @@ class TestDict(TestCase):
             new.feature_set_size_and_feature_to_string_map,
         )
 
-        os.remove("test.pkl")
+        os.remove("test2.pkl")
