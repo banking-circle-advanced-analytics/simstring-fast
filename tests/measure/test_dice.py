@@ -1,31 +1,37 @@
 # -*- coding:utf-8 -*-
 
-from unittest import TestCase
+import pytest
 from simstring.measure.dice import DiceMeasure
 
+# Instantiate the measure once for all tests
+measure = DiceMeasure()
 
-class TestDice(TestCase):
-    measure = DiceMeasure()
+@pytest.mark.parametrize("feature_count, similarity, expected_min_size", [
+    (5, 1.0, 5),
+    (5, 0.5, 2)
+])
+def test_min_feature_size(feature_count, similarity, expected_min_size):
+    assert measure.min_feature_size(feature_count, similarity) == expected_min_size
 
-    def test_min_feature_size(self):
-        self.assertEqual(self.measure.min_feature_size(5, 1.0), 5)
-        self.assertEqual(self.measure.min_feature_size(5, 0.5), 2)
+@pytest.mark.parametrize("feature_count, similarity, expected_max_size", [
+    (5, 1.0, 5),
+    (5, 0.5, 15)
+])
+def test_max_feature_size(feature_count, similarity, expected_max_size):
+    assert measure.max_feature_size(feature_count, similarity) == expected_max_size
 
-    def test_max_feature_size(self):
-        self.assertEqual(self.measure.max_feature_size(5, 1.0), 5)
-        self.assertEqual(self.measure.max_feature_size(5, 0.5), 15)
+@pytest.mark.parametrize("x_size, y_size, similarity, expected_count", [
+    (5, 5, 1.0, 13),
+    (5, 20, 1.0, 50),
+    (5, 5, 0.5, 7)
+])
+def test_minimum_common_feature_count(x_size, y_size, similarity, expected_count):
+    assert measure.minimum_common_feature_count(x_size, y_size, similarity) == expected_count
 
-    def test_minimum_common_feature_count(self):
-        self.assertEqual(self.measure.minimum_common_feature_count(5, 5, 1.0), 13)
-        self.assertEqual(self.measure.minimum_common_feature_count(5, 20, 1.0), 50)
-        self.assertEqual(self.measure.minimum_common_feature_count(5, 5, 0.5), 7)
-
-    def test_similarity(self):
-        x = ["1", "2", "3"]
-        y = ["1", "2", "3", "4"]
-        self.assertEqual(round(self.measure.similarity(x, x), 2), 1.0)
-        self.assertEqual(round(self.measure.similarity(x, y), 2), 0.86)
-
-        x = ["ni", "ig", "gh", "ht"]
-        y = ["na", "ac", "ch", "ht"]
-        self.assertEqual(round(self.measure.similarity(x, y), 2), 0.25)
+@pytest.mark.parametrize("x, y, expected_similarity", [
+    (["1", "2", "3"], ["1", "2", "3"], 1.0),
+    (["1", "2", "3"], ["1", "2", "3", "4"], 0.86),
+    (["ni", "ig", "gh", "ht"], ["na", "ac", "ch", "ht"], 0.25)
+])
+def test_similarity(x, y, expected_similarity):
+    assert round(measure.similarity(x, y), 2) == expected_similarity
