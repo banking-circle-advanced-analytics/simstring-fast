@@ -118,3 +118,25 @@ def test_ranked_search_example_long(ranked_cosine_long_searcher, query, threshol
 ])
 def test_ranked_search_jaccard(ranked_jaccard_searcher, query, threshold, expected_results):
     assert ranked_jaccard_searcher.ranked_search(query, threshold) == expected_results
+
+
+def test_deteminism():
+    db = DictDatabase(CharacterNgramFeatureExtractor(2))
+    db.add("fo")
+    db.add("foo")
+    db.add("fooo")
+    db.add("foooo")
+    db.add("fooooo")
+    db.add("foooooo")
+    db.add("fooooooo")
+    db.add("foooooooo")
+    db.add("fooooooooo")
+    db.add("foooooooooo")
+    db.add("fooooooooooo")
+    db.add("foooooooooooo")
+    db.add("fooooooooooooo")
+    db.add("foooooooooooooo")
+    db.add("fooooooooooooooo")
+    searcher =  Searcher(db, CosineMeasure())
+    result = searcher.search("foo", 0.8)
+    # breakpoint()

@@ -18,6 +18,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: Implementation :: CPython",
 ]
 dependencies = ["diskcache==5.6.3", "setuptools>=70.0.0"]
@@ -65,7 +66,7 @@ dependencies = [
   "pytest==7.4.2",
   "pytest-cov==4.1.0",
   "build",
-  "cython==3.0.0",
+  "cython==3.0.12",
   "faker",
   "tqdm",
   "pdbpp",
@@ -75,7 +76,7 @@ dependencies = [
 
 
 [[tool.hatch.envs.test.matrix]]
-python = ["310", "311", "312"]
+python = ["310", "311", "312", "3.13"]
 
 [tool.coverage.run]
 branch = true
@@ -115,7 +116,7 @@ dependencies = [
    "pyinstrument", "benchmarker" , "numpy", "tqdm"
 ]
 [[tool.hatch.envs.benchmark.matrix]]
-python = [ "310", "311", "312"]
+python = [ "310", "311", "312", "313"]
 
 [tool.hatch.envs.benchmark.scripts]
 
