@@ -8,9 +8,9 @@ class BaseFeatureExtractor:
         raise NotImplementedError()
 
 
-    def _words_ngram(self, words: list[str], n: int, SENTINAL_CHAR: str):
+    def _words_ngram(self, words: list[str], n: int, SENTINAL_CHAR: str) -> list[tuple[str]]:
         xs = [SENTINAL_CHAR] + words + [SENTINAL_CHAR]
-        combinations = [xs[i : i + n] for i in range(len(xs) - n + 1)]
+        combinations: list[list[str]] = [xs[i : i + n] for i in range(len(xs) - n + 1)]
         return [tuple(x) for x in combinations]
 
     def uniquify_list(self, non_unique_list: list[str]) -> list[str]:
@@ -28,7 +28,7 @@ class BaseFeatureExtractor:
 
         """
         counter: dict[str, int] = defaultdict(int)
-        unique_list = []
+        unique_list: list[str] = []
         for val in non_unique_list:
             counter[val] += 1
             unique_list.append(f"{val}_{counter[val]}")

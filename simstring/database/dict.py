@@ -4,11 +4,10 @@ from .base import BaseDatabase
 from simstring.feature_extractor.character_ngram import CharacterNgramFeatureExtractor
 from simstring.feature_extractor.word_ngram import WordNgramFeatureExtractor
 import pickle
-import ast
 from io import BufferedWriter
 
 
-def defaultdict_set():
+def defaultdict_set() -> defaultdict[str, set[str]]:
     return defaultdict(set)
 
 
@@ -22,7 +21,7 @@ class DictDatabase(BaseDatabase):
         self.feature_extractor = feature_extractor
         self.strings: list[str] = []
         self.feature_set_size_to_string_map: dict[int, set[str]] = dict()
-        self.feature_set_size_and_feature_to_string_map: dict = defaultdict(
+        self.feature_set_size_and_feature_to_string_map: dict[int, defaultdict[str, set[str]]] = defaultdict(
             defaultdict_set
         )
         self._min_feature_size = 9999999

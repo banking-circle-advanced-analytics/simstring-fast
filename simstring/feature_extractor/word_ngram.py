@@ -2,7 +2,7 @@ from .base import BaseFeatureExtractor, SENTINAL_CHAR
 
 
 class WordNgramFeatureExtractor(BaseFeatureExtractor):
-    def __init__(self, n=2, splitter=" "):
+    def __init__(self, n: int = 2, splitter: str = " "):
         self.n = n
         self.splitter = splitter
 
