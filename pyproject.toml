@@ -47,7 +47,6 @@ mypy-args = [
 ]
 exclude = [
   "simstring/database/disk.py",
-  "simstring/database/base.py",
 ]
 
 
@@ -66,7 +65,7 @@ dependencies = [
   "pytest==7.4.2",
   "pytest-cov==4.1.0",
   "build",
-  "cython==3.0.12",
+  "cython==3.1.4",
   "faker",
   "tqdm",
   "pdbpp",
